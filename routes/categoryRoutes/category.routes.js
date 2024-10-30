@@ -8,4 +8,7 @@ router.post("/create", categoryController.createCategory);
 // Obtenir toutes les catégories d'une boutique
 router.get("/shop/:shopId", categoryController.getCategoriesByShop);
 
+router.delete('/:categoryId', categoryController.deleteCategory);
+
+
 module.exports = router;

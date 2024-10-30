@@ -14,10 +14,11 @@ const app = express();
 
 // Middlewares
 app.use(express.json());
+// app.use(cors());
 app.use(cors({
-    origin: 'http://localhost:5173', // Domaine du frontend
-    credentials: true,               // Permet d'envoyer des cookies
-  }));
+  origin: ["http://localhost:3000"],
+  credentials: true, // Autorise les cookies
+}));
 // app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
 app.use(cookieParser());
 app.use(morgan('dev'));
@@ -35,6 +36,7 @@ const store = require('./routes/shop/shop.routes');
 const category = require('./routes/categoryRoutes/category.routes');
 const product = require('./routes/productRoutes/product.routes');
 const cart = require('./routes/cart/cart.routes');
+const orderRoutes = require('./routes/order/order.routes');
 
 
 // Connexion à MongoDB
@@ -63,6 +65,8 @@ app.use('/api/store', store)
 app.use('/api/category', category)
 app.use('/api/product', product)
 app.use('/api/cart', cart)
+// Use the order routes
+app.use("/api/orders", orderRoutes);
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 5000;

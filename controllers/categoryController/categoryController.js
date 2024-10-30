@@ -43,16 +43,21 @@ exports.createCategory = async (req, res) => {
   };
   
 
-//   http://localhost:5000/api/category/create
 
+  // Delete a category by ID
+exports.deleteCategory = async (req, res) => {
+  const { categoryId } = req.params;
 
-//   {
-//     "message": "Category created successfully",
-//     "category": {
-//         "name": "chocolat",
-//         "shop": "670e4f39685f55fa4eb61c3c",
-//         "_id": "670e5196e4af5c120163cfbf",
-//         "createdAt": "2024-10-15T11:27:18.092Z",
-//         "__v": 0
-//     }
-// }
+  try {
+ // Find the product by ID and delete it
+ const category = await Category.findByIdAndDelete(categoryId);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    res.status(200).json({ message: "Category deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting category", error });
+  }
+};
+

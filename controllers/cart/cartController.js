@@ -33,9 +33,6 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-
-
-
 exports.updateCart = async (req, res) => {
   const { productId, quantity } = req.body;
 
@@ -56,23 +53,39 @@ exports.updateCart = async (req, res) => {
 };
 
 exports.removeFromCart = async (req, res) => {
-  const { productId } = req.body;
+  const { productId } = req.params; // ID du produit, pas du cart item
 
+  console.log('Product ID from request:', productId);
+  
   try {
     const user = await User.findById(req.user.userId);
-    const itemIndex = user.cart.findIndex(item => item.product.toString() === productId); // Trouver l'index du produit
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Comparer avec item.product.toString()
+    const itemIndex = user.cart.findIndex(item => item._id.toString() === productId);
+
+    console.log('Index of product:', itemIndex);
+    console.log('User cart before modification:', user.cart);
 
     if (itemIndex !== -1) {
       if (user.cart[itemIndex].quantity > 1) {
-        user.cart[itemIndex].quantity -= 1; // Diminuer la quantité
+        user.cart[itemIndex].quantity -= 1;
       } else {
-        user.cart.splice(itemIndex, 1); // Supprimer le produit s'il ne reste plus de quantité
+        user.cart.splice(itemIndex, 1);
       }
-    }
 
-    await user.save();
-    res.status(200).json({ message: "Product quantity decreased or removed from cart", cart: user.cart });
+      await user.save();
+      console.log('User cart after modification:', user.cart);
+
+      return res.status(200).json({ message: "Product quantity decreased or removed from cart", cart: user.cart });
+    } else {
+      return res.status(404).json({ message: "Product not found in cart" });
+    }
   } catch (error) {
+    console.error("Error:", error);
     res.status(500).json({ message: "Error removing product from cart", error });
   }
 };
@@ -84,5 +97,21 @@ exports.getCart = async (req, res) => {
     res.status(200).json(user.cart);
   } catch (error) {
     res.status(500).json({ message: "Error fetching cart", error });
+  }
+};
+
+exports.clearCart = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.cart = []; // Vider le panier
+    await user.save();
+    
+    res.status(200).json({ message: "Cart cleared", cart: user.cart });
+  } catch (error) {
+    res.status(500).json({ message: "Error clearing cart", error: error.message });
   }
 };

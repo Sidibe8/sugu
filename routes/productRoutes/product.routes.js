@@ -11,4 +11,7 @@ router.get("/:categoryId", productController.getProductsByCategory);
 // Route pour obtenir les produits d'une boutique par ID
 router.get("/shop/:shopId", productController.getProductsByShop);
 
+// Route to delete a product
+router.delete("/:productId", productController.deleteProduct);
+
 module.exports = router;

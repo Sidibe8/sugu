@@ -4,7 +4,7 @@ const path = require("path");
 // Configuration du stockage pour Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/products"); // Le dossier où les fichiers seront sauvegardés
+    cb(null, "uploads/products"); // Ensure this folder exists
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
@@ -25,7 +25,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Limite de la taille des fichiers (5MB ici)
+// Limite de la taille des fichiers
 const limits = {
   fileSize: 5 * 1024 * 1024, // 5MB
 };
@@ -35,6 +35,6 @@ const upload = multer({
   storage: storage,
   limits: limits,
   fileFilter: fileFilter
-}).single("productImage"); // Utilisation d'un seul fichier d'image par produit
+}).single("productImage"); // Match with the frontend
 
 module.exports = upload;

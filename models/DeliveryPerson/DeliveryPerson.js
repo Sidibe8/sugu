@@ -32,27 +32,10 @@ const deliveryPersonSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  orders: [
-    {
-      orderDetails: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Order", // Référence au modèle de commande
-      },
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Référence à l'utilisateur
-      },
-      store: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Store", // Référence à la boutique
-      },
-      status: {
-        type: String,
-        default: "pending", // Statut par défaut à "pending"
-        enum: ["pending", "accepted", "in_delivery", "delivered"], // Liste des statuts possibles
-      },
-    }
-  ],
+  isAvailable: { // Champ ajouté pour indiquer la disponibilité
+    type: Boolean,
+    default: true, // Par défaut, le livreur est disponible
+  },
   createdAt: {
     type: Date,
     default: Date.now,

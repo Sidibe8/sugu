@@ -27,19 +27,23 @@ exports.registerUser = async (req, res) => {
 
     await newUser.save();
 
-    // Générer le token après la création de l'utilisateur
-    const token = jwt.sign(
+    console.log("User saved", newUser)
+
+     // Générer le token après la création de l'utilisateur
+     const token = jwt.sign(
       { userId: newUser._id, role: newUser.role },
       process.env.JWT_SECRET,
       { expiresIn: "48h" }
     );
 
-    // Envoyer le cookie qui expire dans 5 jours
+    // Configurer le cookie avec les mêmes paramètres que loginUser
     res.cookie("token", token, {
       maxAge: 5 * 24 * 60 * 60 * 1000,
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax', // Peut aussi être 'Strict' ou 'None'
     });
-
+    
     // Renvoie les informations de l'utilisateur sans le mot de passe
     const { password: _, ...userWithoutPassword } = newUser._doc; // Exclure le mot de passe
     res
@@ -85,6 +89,7 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: "Error logging in", error });
   }
 };
+
 
 // Mettre à jour les informations d'un utilisateur
 exports.updateUser = async (req, res) => {
