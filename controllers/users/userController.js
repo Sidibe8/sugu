@@ -41,8 +41,9 @@ exports.registerUser = async (req, res) => {
       maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Utiliser HTTPS en production
-      sameSite: 'Lax', // Peut être 'Strict' ou 'None'
+      sameSite: 'None', // Peut être 'Strict' ou 'None'
     });
+    
     // Renvoie les informations de l'utilisateur sans le mot de passe
     const { password: _, ...userWithoutPassword } = newUser._doc; // Exclure le mot de passe
     res
@@ -76,7 +77,7 @@ exports.loginUser = async (req, res) => {
       maxAge: 5 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax', // Peut aussi être 'Strict' ou 'None'
+      sameSite: 'None', // Peut aussi être 'Strict' ou 'None'
     });
     
     
