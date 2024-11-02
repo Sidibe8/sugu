@@ -41,7 +41,7 @@ exports.registerUser = async (req, res) => {
 res.cookie("token", token, {
     maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
     httpOnly: true,
-    secure: true, // HTTPS en production
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'None', // Pour autoriser cross-origin
      domain: '.sugu.onrender.com'
   });
@@ -81,7 +81,7 @@ exports.loginUser = async (req, res) => {
 res.cookie("token", token, {
     maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
     httpOnly: true,
-    secure: true, // HTTPS en production
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'None', // Pour autoriser cross-origin
      domain: '.sugu.onrender.com'
   });

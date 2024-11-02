@@ -23,17 +23,29 @@ const allowedOrigins = [
 
 // Appliquez le middleware CORS
 app.use(cors({
-  origin: allowedOrigins, // Utiliser les origines autorisées spécifiques
-  credentials: true, // Permettre les cookies cross-origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Autoriser toutes les méthodes HTTP nécessaires
-  allowedHeaders: ['Content-Type', 'Authorization'], // Spécifiez les en-têtes autorisés
+  origin: (origin, callback) => {
+    // Autorise les origines spécifiques et localhost pour le développement
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Autoriser les cookies cross-origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  allowedHeaders: ['Content-Type', 'Authorization'], 
 }));
 
-// Ajouter manuellement l'en-tête 'Access-Control-Allow-Credentials' pour iOS
+// Ajoutez ce middleware pour définir explicitement les en-têtes
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
+
+
 
 app.use(cookieParser());
 app.use(morgan('dev'));
