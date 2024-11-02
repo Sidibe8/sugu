@@ -36,14 +36,13 @@ exports.registerUser = async (req, res) => {
       { expiresIn: "48h" }
     );
 
-    // Configurer le cookie avec les mêmes paramètres que loginUser
+    // Configurer le cookie
     res.cookie("token", token, {
-      maxAge: 5 * 24 * 60 * 60 * 1000,
+      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax', // Peut aussi être 'Strict' ou 'None'
+      secure: process.env.NODE_ENV === 'production', // Utiliser HTTPS en production
+      sameSite: 'Lax', // Peut être 'Strict' ou 'None'
     });
-    
     // Renvoie les informations de l'utilisateur sans le mot de passe
     const { password: _, ...userWithoutPassword } = newUser._doc; // Exclure le mot de passe
     res
