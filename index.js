@@ -16,14 +16,14 @@ const app = express();
 app.use(express.json());
 
 // Définissez les origines autorisées
-// const allowedOrigins = [
-//   "http://localhost:3000",
-//   ""
-// ];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://esugu.netlify.app"
+];
 
 // Appliquez le middleware CORS
 app.use(cors({
-  origin: "https://esugu.netlify.app", // Utiliser les origines autorisées spécifiques
+  origin: allowedOrigins, // Utiliser les origines autorisées spécifiques
   credentials: true, // Permettre les cookies cross-origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Autoriser toutes les méthodes HTTP nécessaires
   allowedHeaders: ['Content-Type', 'Authorization'], // Spécifiez les en-têtes autorisés
