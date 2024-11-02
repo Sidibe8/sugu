@@ -62,10 +62,13 @@ app.get('/', (req, res) => {
 // Route de déconnexion avec suppression du cookie de token
 app.post('/logout', (req, res) => {
     res.clearCookie('token', {
+
+      
+      
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Assurez-vous que ce paramètre est activé en production
       sameSite: 'None', // Utiliser 'None' pour la compatibilité avec iOS dans un contexte cross-origin
-      path: '/', // Chemin du cookie
+      // path: '/', // Chemin du cookie
     });
     res.status(200).send({ message: 'Déconnexion réussie et cookie supprimé' });
 });
