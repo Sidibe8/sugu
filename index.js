@@ -14,28 +14,49 @@ const app = express();
 
 // Middlewares
 app.use(express.json());
-// app.use(cors());
+
 // Définissez les origines autorisées
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://esugu.netlify.app"
-];
+// const allowedOrigins = [
+//   "http://localhost:3000",
+//   ""
+// ];
 
 // Appliquez le middleware CORS
 app.use(cors({
-  origin: true, // Autoriser toutes les origines
+  origin: "https://esugu.netlify.app", // Utiliser les origines autorisées spécifiques
   credentials: true, // Permettre les cookies cross-origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Autoriser toutes les méthodes HTTP nécessaires
   allowedHeaders: ['Content-Type', 'Authorization'], // Spécifiez les en-têtes autorisés
 }));
-// app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
+
+// Ajouter manuellement l'en-tête 'Access-Control-Allow-Credentials' pour iOS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 app.use(cookieParser());
 app.use(morgan('dev'));
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Connexion à MongoDB
+connectDB();
 
+// Routes
+app.get('/', (req, res) => {
+    res.send('Bienvenue sur la plateforme de livraison locale !');
+});
 
-
+// Route de déconnexion avec suppression du cookie de token
+app.post('/logout', (req, res) => {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Assurez-vous que ce paramètre est activé en production
+      sameSite: 'None', // Utiliser 'None' pour la compatibilité avec iOS dans un contexte cross-origin
+      path: '/', // Chemin du cookie
+    });
+    res.status(200).send({ message: 'Déconnexion réussie et cookie supprimé' });
+});
 
 // GLOBAL ROUTES
 const userRoutes = require('./routes/users/user.routes');
@@ -47,34 +68,14 @@ const product = require('./routes/productRoutes/product.routes');
 const cart = require('./routes/cart/cart.routes');
 const orderRoutes = require('./routes/order/order.routes');
 
-
-// Connexion à MongoDB
-connectDB();
-
-// Routes
-app.get('/', (req, res) => {
-    res.send('Bienvenue sur la plateforme de livraison locale !');
-});
-
-app.post('/logout', (req, res) => {
-    res.clearCookie('token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax', // Correspond à la configuration du cookie
-      path: '/', // Assurez-vous que le chemin est correct
-    });
-    res.status(200).send({ message: 'Déconnexion réussie et cookie supprimé' });
-  });
-  
 // Utilisation des routes utilisateurs (clients)
-app.use('/api/users', userRoutes)
-app.use('/api/livreur', livreurRoutes)
-app.use('/api/store-type', storeTypeRoutes)
-app.use('/api/store', store)
-app.use('/api/category', category)
-app.use('/api/product', product)
-app.use('/api/cart', cart)
-// Use the order routes
+app.use('/api/users', userRoutes);
+app.use('/api/livreur', livreurRoutes);
+app.use('/api/store-type', storeTypeRoutes);
+app.use('/api/store', store);
+app.use('/api/category', category);
+app.use('/api/product', product);
+app.use('/api/cart', cart);
 app.use("/api/orders", orderRoutes);
 
 // Démarrer le serveur
