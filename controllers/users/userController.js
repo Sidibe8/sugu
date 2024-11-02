@@ -41,7 +41,7 @@ exports.registerUser = async (req, res) => {
 res.cookie("token", token, {
   maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // active HTTPS en production
+  Secure:true, // active HTTPS en production
   sameSite: 'None', // 'None' permet cross-origin en HTTPS
 });
 
@@ -79,7 +79,7 @@ exports.loginUser = async (req, res) => {
 res.cookie("token", token, {
   maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // active HTTPS en production
+  Secure:true, // active HTTPS en production
   sameSite: 'None', // 'None' permet cross-origin en HTTPS
 });
 
