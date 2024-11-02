@@ -27,35 +27,31 @@ exports.registerUser = async (req, res) => {
 
     await newUser.save();
 
-    console.log("User saved", newUser)
 
-     // Générer le token après la création de l'utilisateur
-     const token = jwt.sign(
+    // Générer le token après la création de l'utilisateur
+    const token = jwt.sign(
       { userId: newUser._id, role: newUser.role },
       process.env.JWT_SECRET,
       { expiresIn: "48h" }
     );
 
     // Configurer le cookie
-   // Dans userController.js, lors de la définition du cookie
-res.cookie("token", token, {
-    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'None', // Pour autoriser cross-origin
-    //  domain: '.sugu.onrender.com'
-  });
+    // Dans userController.js, lors de la définition du cookie
+    res.cookie("token", token, {
+      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None", // Pour autoriser cross-origin
+      //  domain: '.sugu.onrender.com'
+    });
 
-
-    
     // Renvoie les informations de l'utilisateur sans le mot de passe
     const { password: _, ...userWithoutPassword } = newUser._doc; // Exclure le mot de passe
-    res
-      .status(201)
-      .json({
-        message: "User registered successfully",
-        user: userWithoutPassword,
-      });
+    res.status(201).json({
+      message: "User registered successfully",
+      user: userWithoutPassword,
+      token:token
+    });
   } catch (error) {
     res.status(500).json({ message: "Error registering user", error });
   }
@@ -77,27 +73,22 @@ exports.loginUser = async (req, res) => {
       { expiresIn: "48h" }
     );
 
-   // Dans userController.js, lors de la définition du cookie
-res.cookie("token", token, {
-    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'None', // Pour autoriser cross-origin
-    //  domain: '.sugu.onrender.com'
-  });
-
-
-    
-    
+    // Dans userController.js, lors de la définition du cookie
+    res.cookie("token", token, {
+      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None", // Pour autoriser cross-origin
+      //  domain: '.sugu.onrender.com'
+    });
 
     // Renvoie les informations de l'utilisateur sans le mot de passe
     const { password: _, ...userWithoutPassword } = user._doc; // Exclure le mot de passe
-    res.json({ message: "Login successful", user: userWithoutPassword });
+    res.json({ message: "Login successful", user: userWithoutPassword,  token:token });
   } catch (error) {
     res.status(500).json({ message: "Error logging in", error });
   }
 };
-
 
 // Mettre à jour les informations d'un utilisateur
 exports.updateUser = async (req, res) => {
@@ -129,15 +120,16 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
 // Récupérer tous les utilisateurs avec les détails du panier
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().populate('cart.product'); // Peupler le champ 'product' dans le cart
+    const users = await User.find().populate("cart.product"); // Peupler le champ 'product' dans le cart
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error fetching users", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching users", error: error.message });
   }
 };
 
@@ -146,17 +138,18 @@ exports.getUserById = async (req, res) => {
   const { id } = req.params; // Récupérer l'ID de l'utilisateur à partir des paramètres de la requête
 
   try {
-    const user = await User.findById(id).populate('cart.product'); // Peupler le champ 'product' dans le cart
+    const user = await User.findById(id).populate("cart.product"); // Peupler le champ 'product' dans le cart
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error fetching user", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching user", error: error.message });
   }
 };
-
 
 /* 
 {
