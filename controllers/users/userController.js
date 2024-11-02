@@ -41,9 +41,11 @@ exports.registerUser = async (req, res) => {
 res.cookie("token", token, {
   maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
   httpOnly: true,
-  Secure:true, // active HTTPS en production
-  sameSite: 'None', // 'None' permet cross-origin en HTTPS
+  secure: true, // HTTPS en production
+  sameSite: 'None', // Cross-origin cookies
+  domain: 'sugu.onrender.com', // Explicit domain
 });
+
 
     
     // Renvoie les informations de l'utilisateur sans le mot de passe
@@ -79,9 +81,11 @@ exports.loginUser = async (req, res) => {
 res.cookie("token", token, {
   maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
   httpOnly: true,
-  Secure:true, // active HTTPS en production
-  sameSite: 'None', // 'None' permet cross-origin en HTTPS
+  secure: true, // HTTPS en production
+  sameSite: 'None', // Cross-origin cookies
+  domain: 'sugu.onrender.com', // Explicit domain
 });
+
 
     
     
