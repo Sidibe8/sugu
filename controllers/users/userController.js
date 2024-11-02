@@ -37,12 +37,14 @@ exports.registerUser = async (req, res) => {
     );
 
     // Configurer le cookie
-    res.cookie("token", token, {
-      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Utiliser HTTPS en production
-      sameSite: 'None', // Peut être 'Strict' ou 'None'
-    });
+   // Dans userController.js, lors de la définition du cookie
+res.cookie("token", token, {
+  maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production', // active HTTPS en production
+  sameSite: 'None', // 'None' permet cross-origin en HTTPS
+});
+
     
     // Renvoie les informations de l'utilisateur sans le mot de passe
     const { password: _, ...userWithoutPassword } = newUser._doc; // Exclure le mot de passe
@@ -73,12 +75,14 @@ exports.loginUser = async (req, res) => {
       { expiresIn: "48h" }
     );
 
-    res.cookie("token", token, {
-      maxAge: 5 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None', // Peut aussi être 'Strict' ou 'None'
-    });
+   // Dans userController.js, lors de la définition du cookie
+res.cookie("token", token, {
+  maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production', // active HTTPS en production
+  sameSite: 'None', // 'None' permet cross-origin en HTTPS
+});
+
     
     
 
