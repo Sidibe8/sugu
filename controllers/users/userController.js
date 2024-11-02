@@ -43,6 +43,7 @@ res.cookie("token", token, {
     httpOnly: true,
     secure: true, // HTTPS en production
     sameSite: 'None', // Pour autoriser cross-origin
+     domain: '.sugu.onrender.com'
   });
 
 
@@ -82,6 +83,7 @@ res.cookie("token", token, {
     httpOnly: true,
     secure: true, // HTTPS en production
     sameSite: 'None', // Pour autoriser cross-origin
+     domain: '.sugu.onrender.com'
   });
 
 
