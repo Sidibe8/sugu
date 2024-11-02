@@ -39,12 +39,11 @@ exports.registerUser = async (req, res) => {
     // Configurer le cookie
    // Dans userController.js, lors de la définition du cookie
 res.cookie("token", token, {
-  maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
-  httpOnly: true,
-  secure: true, // HTTPS en production
-  sameSite: 'None', // Cross-origin cookies
-  domain: 'sugu.onrender.com', // Explicit domain
-});
+    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
+    httpOnly: true,
+    secure: true, // HTTPS en production
+    sameSite: 'None', // Pour autoriser cross-origin
+  });
 
 
     
@@ -79,12 +78,11 @@ exports.loginUser = async (req, res) => {
 
    // Dans userController.js, lors de la définition du cookie
 res.cookie("token", token, {
-  maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
-  httpOnly: true,
-  secure: true, // HTTPS en production
-  sameSite: 'None', // Cross-origin cookies
-  domain: 'sugu.onrender.com', // Explicit domain
-});
+    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 jours
+    httpOnly: true,
+    secure: true, // HTTPS en production
+    sameSite: 'None', // Pour autoriser cross-origin
+  });
 
 
     

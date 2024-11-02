@@ -23,10 +23,11 @@ const allowedOrigins = [
 
 // Appliquez le middleware CORS
 app.use(cors({
-  origin: true,
-  credentials: true,
+  origin: true, // Autoriser toutes les origines
+  credentials: true, // Permettre les cookies cross-origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Autoriser toutes les méthodes HTTP nécessaires
+  allowedHeaders: ['Content-Type', 'Authorization'], // Spécifiez les en-têtes autorisés
 }));
-
 // app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
 app.use(cookieParser());
 app.use(morgan('dev'));
