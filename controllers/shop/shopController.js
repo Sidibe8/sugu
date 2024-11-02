@@ -102,7 +102,6 @@ exports.getShopsByType = async (req, res) => {
 exports.getShopById = async (req, res) => {
   const { shopId } = req.params;
 
-  console.log(shopId, 'getShopById');
   
   try {
     
@@ -111,6 +110,22 @@ exports.getShopById = async (req, res) => {
 
     if (!shop) {
       return res.status(404).json({ message: "Shop not found" });
+    }
+
+    res.status(200).json(shop);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching shop", error });
+  }
+};
+exports.getShops = async (req, res) => {
+  
+  try {
+    
+    // Récupérer la boutique par ID et peupler les produits associés
+    const shop = await Shop.find() // Utilisez 'products' si vous avez une référence vers les produits dans le modèle de boutique
+
+    if (!shop) {
+      return res.status(404).json({ message: "Shops not found" });
     }
 
     res.status(200).json(shop);
