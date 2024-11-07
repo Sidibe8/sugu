@@ -1,8 +1,8 @@
 // controllers/shopController.js
 const Shop = require("../../models/shop/Shop");
 const bcrypt = require("bcrypt");
-
 const jwt = require("jsonwebtoken");
+const { sendActivationEmail } = require("../../utils/StoreEmailRegister");  // Mettez à jour le chemin selon votre structure de dossier
 
 
 exports.createShop = async (req, res) => {
@@ -24,6 +24,7 @@ exports.createShop = async (req, res) => {
     // Hash du mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Création d'une nouvelle boutique
     const newShop = new Shop({
       name,
       description,
@@ -40,10 +41,18 @@ exports.createShop = async (req, res) => {
       shopType,
     });
 
-    await newShop.save();
-    res
-      .status(201)
-      .json({ message: "Shop created successfully", shop: newShop });
+    // Sauvegarde de la boutique dans la base de données
+    const savedShop = await newShop.save();
+
+    // Envoi de l'email d'activation après la création de la boutique
+    // Assurez-vous que le chemin de l'image de profil soit passé correctement
+    await sendActivationEmail(savedShop.ownerEmail, savedShop.ownerName, savedShop.name, savedShop._id, savedShop.profileImage);
+
+    // Réponse après la création de la boutique
+    res.status(201).json({
+      message: "Shop created successfully. An activation email has been sent.",
+      shop: savedShop,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error creating shop", error });
   }
@@ -86,27 +95,24 @@ exports.shopLogin = async (req, res) => {
   }
 };
 
-
 exports.getShopsByType = async (req, res) => {
-    const { typeId } = req.params;
-  
-    try {
-      const shops = await Shop.find({ shopType: typeId }).populate("shopType"); // Utilisation de populate pour inclure le type
-      res.status(200).json(shops);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching shops", error });
-    }
+  const { typeId } = req.params;
+
+  try {
+    const shops = await Shop.find({ shopType: typeId }).populate("shopType"); // Utilisation de populate pour inclure le type
+    res.status(200).json(shops);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching shops", error });
+  }
 };
 
 // Fonction pour récupérer une boutique par ID avec ses produits
 exports.getShopById = async (req, res) => {
   const { shopId } = req.params;
 
-  
   try {
-    
-    // Récupérer la boutique par ID et peupler les produits associés
-    const shop = await Shop.findById(shopId) // Utilisez 'products' si vous avez une référence vers les produits dans le modèle de boutique
+    // Récupérer la boutique par ID
+    const shop = await Shop.findById(shopId).populate("products"); // Ajout d'un populate si nécessaire
 
     if (!shop) {
       return res.status(404).json({ message: "Shop not found" });
@@ -117,19 +123,18 @@ exports.getShopById = async (req, res) => {
     res.status(500).json({ message: "Error fetching shop", error });
   }
 };
-exports.getShops = async (req, res) => {
-  
-  try {
-    
-    // Récupérer la boutique par ID et peupler les produits associés
-    const shop = await Shop.find() // Utilisez 'products' si vous avez une référence vers les produits dans le modèle de boutique
 
-    if (!shop) {
+exports.getShops = async (req, res) => {
+  try {
+    // Récupérer toutes les boutiques
+    const shops = await Shop.find().populate("products"); // Ajout d'un populate si nécessaire
+
+    if (!shops || shops.length === 0) {
       return res.status(404).json({ message: "Shops not found" });
     }
 
-    res.status(200).json(shop);
+    res.status(200).json(shops);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching shop", error });
+    res.status(500).json({ message: "Error fetching shops", error });
   }
 };

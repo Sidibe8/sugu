@@ -63,8 +63,6 @@ app.get('/', (req, res) => {
 app.post('/logout', (req, res) => {
     res.clearCookie('token', {
 
-      
-      
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Assurez-vous que ce paramètre est activé en production
       sameSite: 'None', // Utiliser 'None' pour la compatibilité avec iOS dans un contexte cross-origin

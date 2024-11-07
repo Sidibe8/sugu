@@ -30,21 +30,21 @@ exports.createOrder = async (req, res) => {
         }
   
         // Find an available delivery person
-        const deliveryPerson = await DeliveryPerson.findOneAndUpdate(
-          { isAvailable: true },
-          { isAvailable: false },
-          { new: true }
-        );
+        // const deliveryPerson = await DeliveryPerson.findOneAndUpdate(
+        //   { isAvailable: true },
+        //   { isAvailable: false },
+        //   { new: true }
+        // );
   
-        if (!deliveryPerson) {
-          return res.status(404).json({ message: "No available delivery person found." });
-        }
+        // if (!deliveryPerson) {
+        //   return res.status(404).json({ message: "No available delivery person found." });
+        // }
   
         const order = await Order.create({
           user: userId,
           shop: shopId,
           products,
-          deliveryPerson: deliveryPerson._id,
+          // deliveryPerson: deliveryPerson._id,
           status: "pending",
         });
   
@@ -110,8 +110,6 @@ exports.getDeliveryPersonOrders = async (req, res) => {
     }
 };
 
-  
-  
 exports.updateOrderStatus = async (req, res) => {
     const { orderId } = req.params;
     const { status } = req.body;
