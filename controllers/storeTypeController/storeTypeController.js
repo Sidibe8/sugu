@@ -15,21 +15,28 @@ exports.createStoreType = async (req, res) => {
     const storeType = new StoreType({ name, description });
     await storeType.save();
 
-    res.status(201).json({ message: "Store type created successfully", storeType });
+    res
+      .status(201)
+      .json({ message: "Store type created successfully", storeType });
   } catch (error) {
     res.status(500).json({ message: "Error creating store type", error });
   }
 };
 
-// Lister tous les types de boutique
+// Lister tous les types de boutique getAllStoreTypes // StoreType
 exports.getAllStoreTypes = async (req, res) => {
   try {
+
+
     const storeTypes = await StoreType.find();
     res.json(storeTypes);
+    
   } catch (error) {
     res.status(500).json({ message: "Error fetching store types", error });
   }
 };
+
+
 
 // Supprimer un type de boutique
 exports.deleteStoreType = async (req, res) => {
@@ -42,28 +49,25 @@ exports.deleteStoreType = async (req, res) => {
   }
 };
 
-
 exports.getAllShopTypes = async (req, res) => {
-    try {
-      const shopTypes = await StoreType.find();
-      res.status(200).json(shopTypes);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching shop types", error });
-    }
-  };
-  
-  exports.getShopsByType = async (req, res) => {
-    const { typeId } = req.params;
-  
-    try {
-      const shops = await Shop.find({ type: typeId }); // Remplace `type` par le champ réel
-      res.status(200).json(shops);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching shops", error });
-    }
-  };
-  
+  try {
+    const shopTypes = await StoreType.find();
+    res.status(200).json(shopTypes);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching shop types", error });
+  }
+};
 
+exports.getShopsByType = async (req, res) => {
+  const { typeId } = req.params;
+
+  try {
+    const shops = await Shop.find({ type: typeId }); // Remplace `type` par le champ réel
+    res.status(200).json(shops);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching shops", error });
+  }
+};
 
 // http://localhost:5000/api/store-type/
 

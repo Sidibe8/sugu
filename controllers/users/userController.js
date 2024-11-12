@@ -133,6 +133,7 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+
 // Récupérer un utilisateur par ID avec les détails du panier
 exports.getUserById = async (req, res) => {
   const { id } = req.params; // Récupérer l'ID de l'utilisateur à partir des paramètres de la requête

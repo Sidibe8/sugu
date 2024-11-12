@@ -89,6 +89,7 @@ exports.getShopOrders = async (req, res) => {
 };
 
 // Assurez-vous que le middleware d'authentification vérifie et ajoute l'ID du livreur à req.deliveryPerson
+
 exports.getDeliveryPersonOrders = async (req, res) => {
     const { deliveryPersonId } = req.params;
 
