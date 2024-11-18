@@ -46,7 +46,7 @@ exports.createShop = async (req, res) => {
 
     // Envoi de l'email d'activation après la création de la boutique
     // Assurez-vous que le chemin de l'image de profil soit passé correctement
-    await sendActivationEmail(savedShop.ownerEmail, savedShop.ownerName, savedShop.name, savedShop._id, savedShop.profileImage);
+    // await sendActivationEmail(savedShop.ownerEmail, savedShop.ownerName, savedShop.name, savedShop._id, savedShop.profileImage);
 
     // Réponse après la création de la boutique
     res.status(201).json({
@@ -127,7 +127,7 @@ exports.getShopById = async (req, res) => {
 exports.getShops = async (req, res) => {
   try {
     // Récupérer toutes les boutiques
-    const shops = await Shop.find().populate("products"); // Ajout d'un populate si nécessaire
+    const shops = await Shop.find(); // Ajout d'un populate si nécessaire
 
     if (!shops || shops.length === 0) {
       return res.status(404).json({ message: "Shops not found" });
@@ -138,3 +138,4 @@ exports.getShops = async (req, res) => {
     res.status(500).json({ message: "Error fetching shops", error });
   }
 };
+
