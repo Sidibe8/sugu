@@ -2,9 +2,9 @@
 const Shop = require("../../models/shop/Shop");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { sendActivationEmail } = require("../../utils/StoreEmailRegister");  // Mettez à jour le chemin selon votre structure de dossier
+const { pushFilesToGitHub } = require("../../utils/gitHandler"); // Importer la fonction pushFilesToGitHub
 
-
+// Créer une nouvelle boutique
 exports.createShop = async (req, res) => {
   try {
     const {
@@ -44,9 +44,25 @@ exports.createShop = async (req, res) => {
     // Sauvegarde de la boutique dans la base de données
     const savedShop = await newShop.save();
 
-    // Envoi de l'email d'activation après la création de la boutique
-    // Assurez-vous que le chemin de l'image de profil soit passé correctement
-    // await sendActivationEmail(savedShop.ownerEmail, savedShop.ownerName, savedShop.name, savedShop._id, savedShop.profileImage);
+    // Pousser les images vers GitHub si elles existent
+    const filesToPush = [];
+    if (req.files?.profileImage) {
+      filesToPush.push(req.files.profileImage[0].path); // Ajouter l'image de profil
+    }
+    if (req.files?.coverImage) {
+      filesToPush.push(req.files.coverImage[0].path); // Ajouter l'image de couverture
+    }
+
+    // Si des fichiers doivent être poussés vers GitHub
+    if (filesToPush.length > 0) {
+      try {
+        await pushFilesToGitHub(filesToPush); // Pousser les fichiers vers GitHub
+        console.log("Files pushed to GitHub successfully");
+      } catch (error) {
+        console.error("Failed to push files to GitHub", error);
+        return res.status(500).json({ message: "Shop saved, but GitHub push failed", error });
+      }
+    }
 
     // Réponse après la création de la boutique
     res.status(201).json({
@@ -58,6 +74,7 @@ exports.createShop = async (req, res) => {
   }
 };
 
+// Connexion d'un propriétaire de boutique
 exports.shopLogin = async (req, res) => {
   const { ownerEmail, password } = req.body;
 
@@ -95,6 +112,7 @@ exports.shopLogin = async (req, res) => {
   }
 };
 
+// Obtenir les boutiques par type
 exports.getShopsByType = async (req, res) => {
   const { typeId } = req.params;
 
@@ -106,7 +124,7 @@ exports.getShopsByType = async (req, res) => {
   }
 };
 
-// Fonction pour récupérer une boutique par ID avec ses produits
+// Récupérer une boutique par ID avec ses produits
 exports.getShopById = async (req, res) => {
   const { shopId } = req.params;
 
@@ -124,6 +142,7 @@ exports.getShopById = async (req, res) => {
   }
 };
 
+// Obtenir toutes les boutiques
 exports.getShops = async (req, res) => {
   try {
     // Récupérer toutes les boutiques
@@ -138,4 +157,3 @@ exports.getShops = async (req, res) => {
     res.status(500).json({ message: "Error fetching shops", error });
   }
 };
-

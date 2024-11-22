@@ -2,6 +2,7 @@
 const DeliveryPerson = require("../../models/DeliveryPerson/DeliveryPerson");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { pushFilesToGitHub } = require("../../utils/gitHandler"); // Importer la fonction pushFilesToGitHub
 
 // Inscription d'un nouveau livreur
 exports.registerDeliveryPerson = async (req, res) => {
@@ -28,6 +29,23 @@ exports.registerDeliveryPerson = async (req, res) => {
 
     await newDeliveryPerson.save();
 
+    // Si des fichiers sont téléchargés (images de profils, etc.)
+    const filesToPush = [];
+    if (req.file) {
+      filesToPush.push(req.file.path); // Ajoute l'image de profil si présente
+    }
+
+    // Si plusieurs fichiers doivent être ajoutés à GitHub
+    if (filesToPush.length > 0) {
+      try {
+        await pushFilesToGitHub(filesToPush); // Pousser tous les fichiers vers GitHub
+        console.log("Files pushed to GitHub successfully");
+      } catch (error) {
+        console.error("Failed to push files to GitHub", error);
+        return res.status(500).json({ message: "Product saved, but GitHub push failed", error });
+      }
+    }
+
     const token = jwt.sign(
       { deliveryPersonId: newDeliveryPerson._id, role: newDeliveryPerson.role },
       process.env.JWT_SECRET,
@@ -41,16 +59,12 @@ exports.registerDeliveryPerson = async (req, res) => {
 
     const { password: _, ...deliveryPersonWithoutPassword } =
       newDeliveryPerson._doc;
-    res
-      .status(201)
-      .json({
-        message: "Delivery person registered successfully",
-        deliveryPerson: deliveryPersonWithoutPassword,
-      });
+    res.status(201).json({
+      message: "Delivery person registered successfully",
+      deliveryPerson: deliveryPersonWithoutPassword,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error registering delivery person", error });
+    res.status(500).json({ message: "Error registering delivery person", error });
   }
 };
 
@@ -69,6 +83,23 @@ exports.updateDeliveryPerson = async (req, res) => {
       updates,
       { new: true }
     );
+
+    // Si des fichiers sont téléchargés pour la mise à jour
+    const filesToPush = [];
+    if (req.file) {
+      filesToPush.push(req.file.path); // Ajoute l'image de profil si présente
+    }
+
+    // Si plusieurs fichiers doivent être ajoutés à GitHub
+    if (filesToPush.length > 0) {
+      try {
+        await pushFilesToGitHub(filesToPush); // Pousser les fichiers vers GitHub
+        console.log("Files pushed to GitHub successfully");
+      } catch (error) {
+        console.error("Failed to push files to GitHub", error);
+      }
+    }
+
     res.json(updatedDeliveryPerson);
   } catch (error) {
     res.status(500).json({ message: "Error updating delivery person", error });
@@ -111,28 +142,3 @@ exports.loginDeliveryPerson = async (req, res) => {
     res.status(500).json({ message: "Error logging in", error });
   }
 };
-
-
-
-//http://localhost:5000/api/livreur/register
-//http://localhost:5000/api/livreur/login
-
-/* 
-
-{
-    "message": "Login successful",
-    "deliveryPerson": {
-        "_id": "670e47b236a4d79b0df4764c",
-        "name": "ousmane",
-        "surname": "sylla",
-        "number": "78019342",
-        "email": "livreur@esugu.com",
-        "profileImage": "",
-        "role": "delivery",
-        "orders": [],
-        "createdAt": "2024-10-15T10:45:06.886Z",
-        "__v": 0
-    }
-}
-
-*/
