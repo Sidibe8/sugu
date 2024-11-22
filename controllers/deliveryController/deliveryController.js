@@ -42,7 +42,7 @@ exports.registerDeliveryPerson = async (req, res) => {
         console.log("Files pushed to GitHub successfully");
       } catch (error) {
         console.error("Failed to push files to GitHub", error);
-        return res.status(500).json({ message: "Product saved, but GitHub push failed", error });
+        return res.status(500).json({ message: "Delivery person saved, but GitHub push failed", error });
       }
     }
 
