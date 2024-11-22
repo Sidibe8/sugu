@@ -5,32 +5,46 @@ const { pushFileToGitHub } = require("../../utils/gitHandler");
 
 exports.createProduct = async (req, res) => {
   try {
-    const { name, description, price, categoryId } = req.body;
-    const productImage = req.file ? req.file.path : ""; // Chemin du fichier téléchargé par Multer
+    console.log(req.body, "body"); // Log des champs reçus
+    console.log(req.file, "file");
 
-    // Créez le produit dans la base de données
+    const { name, description, price, categoryId, shopId } = req.body;
+
+    // Vérification des champs requis
+    if (!name || !description || !price || !categoryId || !shopId) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Création du produit avec les informations reçues
     const newProduct = new Product({
       name,
       description,
       price,
-      categoryId,
-      productImage,
+      category: categoryId,
+      shop: shopId,
+      image: req.file ? req.file.path : "",
     });
 
+    // Sauvegarde du produit dans la base de données
     await newProduct.save();
 
-    // Si une image a été téléchargée, poussez-la vers GitHub
+    // Pousse le fichier image vers GitHub (si présent)
     if (req.file) {
+      const filePath = req.file.path;
       try {
-        // Poussez l'image du produit vers GitHub (le chemin de fichier est fourni par Multer)
-        await pushFileToGitHub(req.file.path);
-        console.log("Product image pushed to GitHub successfully.");
+        await pushFileToGitHub(filePath);
+        console.log("Image pushed to GitHub successfully");
       } catch (error) {
-        console.error("Failed to push product image to GitHub", error);
+        console.error("Failed to push image to GitHub", error);
+        return res
+          .status(500)
+          .json({ message: "Product saved, but GitHub push failed", error });
       }
     }
 
-    res.status(201).json({ message: "Product created successfully", product: newProduct });
+    res
+      .status(201)
+      .json({ message: "Product created successfully", product: newProduct });
   } catch (error) {
     res.status(500).json({ message: "Error creating product", error });
   }
