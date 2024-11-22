@@ -5,10 +5,7 @@ const { pushFileToGitHub } = require("../../utils/gitHandler");
 
 exports.createProduct = async (req, res) => {
   try {
-    console.log(req.body, "body"); // Log des champs reçus
-    console.log(req.file, "file");
-
-    const { name, description, price, categoryId, shopId } = req.body;
+    const { name, description, price, categoryId, shopId } = req.body; // Assure-toi d'inclure shopId
 
     // Vérification des champs requis
     if (!name || !description || !price || !categoryId || !shopId) {
@@ -20,9 +17,9 @@ exports.createProduct = async (req, res) => {
       name,
       description,
       price,
-      category: categoryId,
-      shop: shopId,
-      image: req.file ? req.file.path : "",
+      category: categoryId, // ID de la catégorie à laquelle le produit est associé
+      shop: shopId, // ID de la boutique à laquelle le produit est associé
+      image: req.file ? req.file.path : "", // Chemin de l'image du produit
     });
 
     // Sauvegarde du produit dans la base de données
