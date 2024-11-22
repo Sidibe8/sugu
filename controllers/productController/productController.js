@@ -1,11 +1,13 @@
 // controllers/productController.js
 const Product = require("../../models/Product/Product");
+const { pushFileToGitHub } = require("../../utils/gitHandler");
 
 exports.createProduct = async (req, res) => {
   try {
-    console.log(req.body, "body"); // Log fields
+    console.log(req.body, "body"); // Log des champs reçus
     console.log(req.file, "file");
-    const { name, description, price, categoryId, shopId } = req.body; // Assure-toi d'inclure shopId
+
+    const { name, description, price, categoryId, shopId } = req.body;
 
     // Vérification des champs requis
     if (!name || !description || !price || !categoryId || !shopId) {
@@ -17,12 +19,28 @@ exports.createProduct = async (req, res) => {
       name,
       description,
       price,
-      category: categoryId, // ID de la catégorie à laquelle le produit est associé
-      shop: shopId, // ID de la boutique à laquelle le produit est associé
-      image: req.file ? req.file.path : "", // Chemin de l'image du produit
+      category: categoryId,
+      shop: shopId,
+      image: req.file ? req.file.path : "",
     });
 
+    // Sauvegarde du produit dans la base de données
     await newProduct.save();
+
+    // Pousse le fichier image vers GitHub (si présent)
+    if (req.file) {
+      const filePath = req.file.path;
+      try {
+        await pushFileToGitHub(filePath);
+        console.log("Image pushed to GitHub successfully");
+      } catch (error) {
+        console.error("Failed to push image to GitHub", error);
+        return res
+          .status(500)
+          .json({ message: "Product saved, but GitHub push failed", error });
+      }
+    }
+
     res
       .status(201)
       .json({ message: "Product created successfully", product: newProduct });
