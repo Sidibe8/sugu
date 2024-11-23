@@ -3,46 +3,54 @@ const Product = require("../../models/Product/Product");
 const { pushFileToGitHub } = require("../../utils/gitHandler");
 
 
+
+
+// Créer un produit
 exports.createProduct = async (req, res) => {
   try {
-    const { name, description, price, categoryId, shopId } = req.body; // Assure-toi d'inclure shopId
+    const { name, description, price, categoryId, shopId } = req.body;
 
     // Vérification des champs requis
     if (!name || !description || !price || !categoryId || !shopId) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Création du produit avec les informations reçues
+    // Création d'une instance de produit avec les données reçues
     const newProduct = new Product({
       name,
       description,
       price,
-      category: categoryId, // ID de la catégorie à laquelle le produit est associé
-      shop: shopId, // ID de la boutique à laquelle le produit est associé
-      image: req.file ? req.file.path : "", // Chemin de l'image du produit
+      category: categoryId, // ID de la catégorie associée
+      shop: shopId, // ID de la boutique associée
+      image: req.file ? req.file.path : "", // Ajoute le chemin de l'image si elle est présente
     });
 
     // Sauvegarde du produit dans la base de données
-    await newProduct.save();
+    const savedProduct = await newProduct.save();
 
-    // Pousse le fichier image vers GitHub (si présent)
+    // Si une image a été uploadée, pousse-la vers GitHub
     if (req.file) {
-      const filePath = req.file.path;
+      const filePath = req.file.path; // Chemin du fichier uploadé
       try {
-        await pushFileToGitHub(filePath);
+        await pushFileToGitHub(filePath); // Pousse le fichier image vers GitHub
         console.log("Image pushed to GitHub successfully");
       } catch (error) {
         console.error("Failed to push image to GitHub", error);
-        return res
-          .status(500)
-          .json({ message: "Product saved, but GitHub push failed", error });
+        return res.status(500).json({
+          message: "Product saved, but GitHub push failed",
+          product: savedProduct,
+          error,
+        });
       }
     }
 
-    res
-      .status(201)
-      .json({ message: "Product created successfully", product: newProduct });
+    // Réponse en cas de succès
+    res.status(201).json({
+      message: "Product created successfully",
+      product: savedProduct,
+    });
   } catch (error) {
+    console.error("Error creating product:", error);
     res.status(500).json({ message: "Error creating product", error });
   }
 };

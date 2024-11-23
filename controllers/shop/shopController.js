@@ -2,7 +2,8 @@
 const Shop = require("../../models/shop/Shop");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { pushFilesToGitHub } = require("../../utils/gitHandler"); // Importer la fonction pushFilesToGitHub
+const { pushFilesToGitHub, pushFileToGitHub } = require("../../utils/gitHandler"); // Importer la fonction pushFilesToGitHub
+
 
 // Créer une nouvelle boutique
 exports.createShop = async (req, res) => {
@@ -44,35 +45,40 @@ exports.createShop = async (req, res) => {
     // Sauvegarde de la boutique dans la base de données
     const savedShop = await newShop.save();
 
-    // Pousser les images vers GitHub si elles existent
+    // Préparer les fichiers à pousser sur GitHub
     const filesToPush = [];
     if (req.files?.profileImage) {
-      filesToPush.push(req.files.profileImage[0].path); // Ajouter l'image de profil
+      filesToPush.push(req.files.profileImage[0].path); // Ajouter le chemin de l'image de profil
     }
     if (req.files?.coverImage) {
-      filesToPush.push(req.files.coverImage[0].path); // Ajouter l'image de couverture
+      filesToPush.push(req.files.coverImage[0].path); // Ajouter le chemin de l'image de couverture
     }
 
-    // Si des fichiers doivent être poussés vers GitHub
+    // Pousser les fichiers sur GitHub
     if (filesToPush.length > 0) {
       try {
-        await pushFilesToGitHub(filesToPush); // Pousser les fichiers vers GitHub
+        await pushFilesToGitHub(filesToPush); // Utiliser la fonction pour pousser plusieurs fichiers
         console.log("Files pushed to GitHub successfully");
       } catch (error) {
         console.error("Failed to push files to GitHub", error);
-        return res.status(500).json({ message: "Shop saved, but GitHub push failed", error });
+        return res.status(500).json({ 
+          message: "Shop saved, but GitHub push failed", 
+          error 
+        });
       }
     }
 
-    // Réponse après la création de la boutique
+    // Répondre au client après la création réussie
     res.status(201).json({
       message: "Shop created successfully. An activation email has been sent.",
       shop: savedShop,
     });
   } catch (error) {
+    console.error("Error creating shop:", error);
     res.status(500).json({ message: "Error creating shop", error });
   }
 };
+
 
 // Connexion d'un propriétaire de boutique
 exports.shopLogin = async (req, res) => {

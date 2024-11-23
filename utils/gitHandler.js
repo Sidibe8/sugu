@@ -25,7 +25,21 @@ const pushFileToGitHub = async (filePath) => {
     console.log(`File successfully pushed to GitHub!`);
   } catch (err) {
     console.error('Error while pushing file to GitHub:', err.message);
+    throw err; // Relance l'erreur pour qu'elle puisse être capturée dans le contrôleur
   }
 };
 
-module.exports = { pushFileToGitHub };
+// Fonction pour pousser plusieurs fichiers
+const pushFilesToGitHub = async (filePaths) => {
+  try {
+    for (const filePath of filePaths) {
+      await pushFileToGitHub(filePath); // Appelle `pushFileToGitHub` pour chaque fichier
+    }
+    console.log('All files successfully pushed to GitHub!');
+  } catch (err) {
+    console.error('Error while pushing files to GitHub:', err.message);
+    throw err; // Relance l'erreur pour qu'elle puisse être capturée dans le contrôleur
+  }
+};
+
+module.exports = { pushFileToGitHub, pushFilesToGitHub };

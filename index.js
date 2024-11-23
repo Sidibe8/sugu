@@ -91,6 +91,10 @@ app.use('/api/product', product);
 app.use('/api/cart', cart);
 app.use("/api/orders", orderRoutes);
 
+app.use('/', (req, res) => {
+  res.send('Hey How are You')
+})
+
 // Démarrer le serveur
 const PORT = process.env.PORT || 5000;
 
