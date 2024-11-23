@@ -18,8 +18,7 @@ app.use(express.json());
 // Définissez les origines autorisées
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://esugu.netlify.app",
-  "https://sugu.vercel.app"
+  "https://esugu.netlify.app"
 ];
 
 // Appliquez le middleware CORS
@@ -92,9 +91,7 @@ app.use('/api/product', product);
 app.use('/api/cart', cart);
 app.use("/api/orders", orderRoutes);
 
-app.use('/', (req, res) => {
-  res.send('Hey How are You')
-})
+
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 5000;
