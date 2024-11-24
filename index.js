@@ -1,3 +1,4 @@
+// Importations des modules
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
@@ -12,33 +13,26 @@ dotenv.config();
 // Création de l'application Express
 const app = express();
 
-// Middlewares
+// Middleware globaux
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(morgan('dev'));
 
+// Configuration des fichiers statiques
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use((err, req, res, next) => {
-  console.error(err.stack); // Log l’erreur pour debug
-  res.status(500).json({ message: "Internal Server Error", error: err.message });
-});
+// Connexion à MongoDB
+connectDB();
 
-
-app.use((req, res, next) => {
-  console.log(`Incoming request: ${req.method} ${req.url}`);
-  next();
-});
-
-
-// Définissez les origines autorisées
+// Configuration de CORS
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://esugu.netlify.app"
+  "https://esugu.netlify.app",
 ];
 
-// Appliquez le middleware CORS
 app.use(cors({
   origin: (origin, callback) => {
-    // Autorise les origines spécifiques et localhost pour le développement
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
     } else {
@@ -46,11 +40,11 @@ app.use(cors({
     }
   },
   credentials: true, // Autoriser les cookies cross-origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-  allowedHeaders: ['Content-Type', 'Authorization'], 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Ajoutez ce middleware pour définir explicitement les en-têtes
+// Configuration des en-têtes CORS supplémentaires
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -59,57 +53,54 @@ app.use((req, res, next) => {
   next();
 });
 
+// Middlewares pour le débogage
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
 
+// Gestionnaire global des erreurs
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log l’erreur pour le débogage
+  res.status(500).json({ message: "Internal Server Error", error: err.message });
+});
 
-app.use(cookieParser());
-app.use(morgan('dev'));
-app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Connexion à MongoDB
-connectDB();
-
-// Routes
+// Routes principales
 app.get('/', (req, res) => {
-    res.send('Bienvenue sur la plateforme de livraison locale !');
+  res.send('Bienvenue sur la plateforme de livraison locale !');
 });
 
-// Route de déconnexion avec suppression du cookie de token
 app.post('/logout', (req, res) => {
-    res.clearCookie('token', {
-
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Assurez-vous que ce paramètre est activé en production
-      sameSite: 'None', // Utiliser 'None' pour la compatibilité avec iOS dans un contexte cross-origin
-      // path: '/', // Chemin du cookie
-    });
-    res.status(200).send({ message: 'Déconnexion réussie et cookie supprimé' });
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // Utilisez true en production
+    sameSite: 'None', // Compatibilité iOS avec le contexte cross-origin
+  });
+  res.status(200).send({ message: 'Déconnexion réussie et cookie supprimé' });
 });
 
-// GLOBAL ROUTES
+// Importation des routes
 const userRoutes = require('./routes/users/user.routes');
 const livreurRoutes = require('./routes/deliveryRoutes/delivery.routes');
 const storeTypeRoutes = require('./routes/storeTypeRoutes/storeType.routes');
-const store = require('./routes/shop/shop.routes');
-const category = require('./routes/categoryRoutes/category.routes');
-const product = require('./routes/productRoutes/product.routes');
-const cart = require('./routes/cart/cart.routes');
+const storeRoutes = require('./routes/shop/shop.routes');
+const categoryRoutes = require('./routes/categoryRoutes/category.routes');
+const productRoutes = require('./routes/productRoutes/product.routes');
+const cartRoutes = require('./routes/cart/cart.routes');
 const orderRoutes = require('./routes/order/order.routes');
 
-// Utilisation des routes utilisateurs (clients)
+// Utilisation des routes
 app.use('/api/users', userRoutes);
 app.use('/api/livreur', livreurRoutes);
 app.use('/api/store-type', storeTypeRoutes);
-app.use('/api/store', store);
-app.use('/api/category', category);
-app.use('/api/product', product);
-app.use('/api/cart', cart);
-app.use("/api/orders", orderRoutes);
+app.use('/api/store', storeRoutes);
+app.use('/api/category', categoryRoutes);
+app.use('/api/product', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
-
-
-// Démarrer le serveur
+// Démarrage du serveur
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
