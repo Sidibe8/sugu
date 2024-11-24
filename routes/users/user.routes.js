@@ -7,15 +7,9 @@ const uploadProfile = require("../../middleware/uploadProfile");
 const adminAuth = require("../../middleware/adminAuth");
 
 // Inscription avec upload de profil
-router.post("/register",  );
+router.post("/register", uploadProfile.single("profileImage"), userController.registerUser);
 
-router.post('/register', uploadProfile.single("profileImage"), (req, res) => {
-    console.log('Request received on /register');
-    console.log('Request body:', req.body);
-    // Appelle la fonction normale après avoir logué
-    userController.registerUser(req, res);
-  });
-  
+
 
 // Connexion
 router.post("/login", userController.loginUser);
