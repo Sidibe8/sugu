@@ -7,7 +7,11 @@ const { pushFilesToGitHub } = require("../../utils/gitHandler");  // Importer la
 // Inscription d'un nouvel utilisateur
 exports.registerUser = async (req, res) => {
   try {
+
+    console.log("Request body:", req.body);
+    
     const { name, surname, number, email, password } = req.body;
+
 
     // Vérification si l'utilisateur existe déjà
     const existingUser = await User.findOne({ email });
