@@ -23,6 +23,12 @@ app.use((err, req, res, next) => {
 });
 
 
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
+
 // Définissez les origines autorisées
 const allowedOrigins = [
   "http://localhost:3000",
